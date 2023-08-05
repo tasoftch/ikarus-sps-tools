@@ -1,0 +1,24 @@
+{
+  "name": "ikarus/sps-tools",
+  "license": "BSD-3-Clause",
+  "authors": [
+    {
+      "name": "Thomas Abplanalp",
+      "email": "info@tasoft.ch"
+    }
+  ],
+  "autoload": {
+    "psr-4": {
+      "Ikarus\\SPS\\Tool\\" : "src"
+    }
+  },
+  "require" : {
+    "php": ">=7.2",
+    "ext-openssl": "*",
+    "ikarus/sps": "^0.8"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "^6",
+    "ikarus/raspberry-pinout": "^0.8"
+  }
+}
