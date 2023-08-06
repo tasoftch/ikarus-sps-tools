@@ -45,12 +45,14 @@ abstract class AbstractEdgeEvent implements CyclicEventTriggerInterface
 	/** @var int|null */
 	private $old_state;
 
-	private $timeout = 0;
+	private $timeout = 0, $last_timeout;
+
+	private $debounce = 0;
 
 	/**
 	 * @param callable|InputPinInterface $trigger
 	 */
-	public function __construct($trigger)
+	public function __construct($trigger, float $debounce = 0)
 	{
 		if($trigger instanceof InputPinInterface) {
 			$trigger = function() use ($trigger) {
@@ -58,19 +60,28 @@ abstract class AbstractEdgeEvent implements CyclicEventTriggerInterface
 			};
 		}
 		$this->trigger = $trigger;
+		$this->old_state = ($this->trigger)();
 		$this->timeout = microtime(true);
+		$this->debounce = $debounce;
 	}
 
 	public function hasEvent(): bool
 	{
+		$mt = microtime(true);
+
 		$s = ($this->trigger)();
 		if($s !== $this->old_state) {
 			$cache = $s;
-			if($this->isEvent($this->old_state, $s, $cache)) {
-				$this->timeout = microtime(true);
-				$this->old_state = $cache;
-				return true;
+
+			if($mt - $this->timeout > $this->debounce) {
+				if($this->isEvent($this->old_state, $s, $cache)) {
+					$this->last_timeout = $mt - $this->timeout;
+					$this->timeout = $mt;
+					$this->old_state = $cache;
+					return true;
+				}
 			}
+
 			$this->old_state = $cache;
 		}
 		return false;
@@ -82,7 +93,7 @@ abstract class AbstractEdgeEvent implements CyclicEventTriggerInterface
 	 * @return float
 	 */
 	public function getTimeout(): float {
-		return microtime(true) - $this->timeout;
+		return $this->last_timeout;
 	}
 
 	/**

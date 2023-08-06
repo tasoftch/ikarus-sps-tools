@@ -37,7 +37,7 @@ namespace Ikarus\SPS\Tool\Event;
 use Ikarus\SPS\Plugin\AbstractPlugin;
 use Ikarus\SPS\Register\MemoryRegisterInterface;
 
-class FallingEdteEvent extends AbstractEdgeEvent
+class FallingEdgeEvent extends AbstractEdgeEvent
 {
 
 	/**
@@ -45,7 +45,7 @@ class FallingEdteEvent extends AbstractEdgeEvent
 	 */
 	protected function isEvent($old_state, $new_state, &$cache_state = NULL): bool
 	{
-		if(AbstractPlugin::isStatusOff( $new_state )) {
+		if(AbstractPlugin::isStatusOff( $new_state ) && !AbstractPlugin::isStatusError($new_state)) {
 			return true;
 		}
 		return false;

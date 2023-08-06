@@ -43,7 +43,7 @@ class AllEdgesEvent extends AbstractEdgeEvent
 	 */
 	protected function isEvent($old_state, $new_state, &$cache_state = NULL): bool
 	{
-		if(AbstractPlugin::isStatusOn($new_state) || AbstractPlugin::isStatusOff($new_state)) {
+		if(!AbstractPlugin::isStatusError($new_state) && ( AbstractPlugin::isStatusOn($new_state) || AbstractPlugin::isStatusOff($new_state) ) ) {
 			return true;
 		}
 		return false;
