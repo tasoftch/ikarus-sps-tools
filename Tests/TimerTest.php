@@ -32,7 +32,7 @@
  *
  */
 
-use Ikarus\SPS\Tool\Timer;
+use Ikarus\SPS\Tool\Timing\Timer;
 use PHPUnit\Framework\TestCase;
 
 class TimerTest extends TestCase

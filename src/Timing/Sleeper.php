@@ -32,48 +32,54 @@
  *
  */
 
-namespace Ikarus\SPS\Tool\Condition;
+namespace Ikarus\SPS\Tool\Timing;
 
-use Ikarus\SPS\Tool\Timing\Timer;
-
-class CallbackCondition extends AbstractCondition
+class Sleeper implements TimingInterface
 {
-	/**
-	 * @var callable
-	 */
-	private $callback;
+	private $timeout = 0;
+	private $timer = -1;
 
 	/**
-	 * @param Timer $timer
-	 * @param callable $callback
+	 * @param int $timeout
+	 * @param int $timer
 	 */
-	public function __construct(Timer $timer, callable $callback)
+	public function __construct(int $timeout = 0, int $unit = self::TIMING_UNIT_MILLI_SECONDS)
 	{
-		parent::__construct($timer);
-		$this->callback = $callback;
+		switch ($unit) {
+			case static::TIMING_UNIT_SECONDS:
+				$timeout *= 1e6;
+				break;
+			case static::TIMING_UNIT_MILLI_SECONDS:
+				$timeout *= 1e3;
+				break;
+			case static::TIMING_UNIT_MINUTES:
+				$timeout *= 60 * 1e6;
+				break;
+		}
+		$this->timeout = $timeout;
 	}
 
-	/**
-	 * @return callable
-	 */
-	public function getCallback(): callable
+	public function reset()
 	{
-		return $this->callback;
+		$this->timer = microtime(true);
 	}
 
-	/**
-	 * @inheritDoc
-	 */
-	protected function resetCondition()
-	{
-		 ($this->getCallback())(true);
-	}
+	public function sleep(bool $useTicks = true) {
+		if($this->timer == -1)
+			throw new \RuntimeException("You must reset a sleeper before use it.");
 
-	/**
-	 * @inheritDoc
-	 */
-	protected function checkCondition(): bool
-	{
-		return (bool) ($this->getCallback())(false);
+		if($this->timeout - (microtime(true) - $this->timer) * 1e6 < 0)
+			goto finish;
+
+		if($useTicks) {
+			declare(ticks=1) {
+				usleep($this->timeout - (microtime(true) - $this->timer) * 1e6);
+			}
+		} else {
+			usleep($this->timeout - (microtime(true) - $this->timer) * 1e6);
+		}
+
+		finish:
+		$this->timer = -1;
 	}
 }

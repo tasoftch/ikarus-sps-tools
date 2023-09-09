@@ -32,48 +32,19 @@
  *
  */
 
-namespace Ikarus\SPS\Tool\Condition;
+namespace Ikarus\SPS\Tool\Timing;
 
-use Ikarus\SPS\Tool\Timing\Timer;
-
-class CallbackCondition extends AbstractCondition
+interface TimingInterface
 {
-	/**
-	 * @var callable
-	 */
-	private $callback;
+	const TIMING_UNIT_MICRO_SECONDS = -2;
+	const TIMING_UNIT_MILLI_SECONDS = -1;
+	const TIMING_UNIT_SECONDS = 0;
+	const TIMING_UNIT_MINUTES = 1;
 
 	/**
-	 * @param Timer $timer
-	 * @param callable $callback
+	 * Resets the timing resource
+	 *
+	 * @return void
 	 */
-	public function __construct(Timer $timer, callable $callback)
-	{
-		parent::__construct($timer);
-		$this->callback = $callback;
-	}
-
-	/**
-	 * @return callable
-	 */
-	public function getCallback(): callable
-	{
-		return $this->callback;
-	}
-
-	/**
-	 * @inheritDoc
-	 */
-	protected function resetCondition()
-	{
-		 ($this->getCallback())(true);
-	}
-
-	/**
-	 * @inheritDoc
-	 */
-	protected function checkCondition(): bool
-	{
-		return (bool) ($this->getCallback())(false);
-	}
+	public function reset();
 }

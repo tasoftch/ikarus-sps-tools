@@ -32,48 +32,49 @@
  *
  */
 
-namespace Ikarus\SPS\Tool\Condition;
+use Ikarus\SPS\Tool\Timing\Sleeper;
+use PHPUnit\Framework\TestCase;
 
-use Ikarus\SPS\Tool\Timing\Timer;
-
-class CallbackCondition extends AbstractCondition
+class SleeperTest extends TestCase
 {
-	/**
-	 * @var callable
-	 */
-	private $callback;
+	public function testSleeperWithoutReset() {
+		$this->expectException(RuntimeException::class);
+		$sleeper = new Sleeper(1, Sleeper::TIMING_UNIT_SECONDS);
+		$sleeper->sleep();
+	}
+	public function testSleeper() {
+		$sleeper = new Sleeper(1, Sleeper::TIMING_UNIT_SECONDS);
 
-	/**
-	 * @param Timer $timer
-	 * @param callable $callback
-	 */
-	public function __construct(Timer $timer, callable $callback)
-	{
-		parent::__construct($timer);
-		$this->callback = $callback;
+		$ms = microtime(true);
+		$sleeper->reset();
+		$sleeper->sleep();
+
+		$this->assertEquals(1.0, microtime(true) - $ms, '', 0.01);
 	}
 
-	/**
-	 * @return callable
-	 */
-	public function getCallback(): callable
-	{
-		return $this->callback;
+	public function testSleeperWithTimingAction() {
+		$sleeper = new Sleeper(1, Sleeper::TIMING_UNIT_SECONDS);
+
+		$ms = microtime(true);
+		$sleeper->reset();
+
+		usleep(4e5);
+
+		$sleeper->sleep();
+
+		$this->assertEquals(1.0, microtime(true) - $ms, '', 0.01);
 	}
 
-	/**
-	 * @inheritDoc
-	 */
-	protected function resetCondition()
-	{
-		 ($this->getCallback())(true);
-	}
+	public function testSleeperWithOvertimeAction() {
+		$sleeper = new Sleeper(1, Sleeper::TIMING_UNIT_SECONDS);
 
-	/**
-	 * @inheritDoc
-	 */
-	protected function checkCondition(): bool
-	{
-		return (bool) ($this->getCallback())(false);
+		$ms = microtime(true);
+		$sleeper->reset();
+
+		sleep(2);
+
+		$sleeper->sleep();
+
+		$this->assertEquals(2.0, microtime(true) - $ms, '', 0.01);
 	}
 }

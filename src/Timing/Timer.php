@@ -32,15 +32,10 @@
  *
  */
 
-namespace Ikarus\SPS\Tool;
+namespace Ikarus\SPS\Tool\Timing;
 
-class Timer
+class Timer implements TimingInterface
 {
-	const TIMER_UNIT_MICRO_SECONDS = -2;
-	const TIMER_UNIT_MILLI_SECONDS = -1;
-	const TIMER_UNIT_SECONDS = 0;
-	const TIMER_UNIT_MINUTES = 1;
-
 	private $timeout = 0;
 	private $timer = 0;
 
@@ -50,19 +45,19 @@ class Timer
 	 * @param int $unit
 	 * @param bool $enable
 	 */
-	public function __construct(int $timeout = 0, int $unit = self::TIMER_UNIT_MILLI_SECONDS, bool $enable = true)
+	public function __construct(int $timeout = 0, int $unit = self::TIMING_UNIT_MILLI_SECONDS, bool $enable = true)
 	{
 		if($timeout<=0)
 			$this->timeout = 0;
 		else {
 			switch ($unit) {
-				case static::TIMER_UNIT_MICRO_SECONDS:
+				case static::TIMING_UNIT_MICRO_SECONDS:
 					$timeout /= 1000000;
 					break;
-				case static::TIMER_UNIT_MILLI_SECONDS:
+				case static::TIMING_UNIT_MILLI_SECONDS:
 					$timeout /= 1000;
 					break;
-				case static::TIMER_UNIT_MINUTES:
+				case static::TIMING_UNIT_MINUTES:
 					$timeout *= 60;
 					break;
 			}

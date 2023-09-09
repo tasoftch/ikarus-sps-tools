@@ -34,7 +34,7 @@
 
 namespace Ikarus\SPS\Tool\Condition;
 
-use Ikarus\SPS\Tool\Timer;
+use Ikarus\SPS\Tool\Timing\Timer;
 
 abstract class AbstractCondition implements ConditionInterface
 {
