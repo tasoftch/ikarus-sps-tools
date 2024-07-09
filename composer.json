@@ -15,7 +15,8 @@
   "require" : {
     "php": ">=7.2",
     "ext-openssl": "*",
-    "ikarus/sps": "^0.8"
+    "ikarus/sps": "^0.8",
+    "tasoft/php-string-parser": "^0.9"
   },
   "require-dev": {
     "phpunit/phpunit": "^6",
